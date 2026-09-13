@@ -161,6 +161,7 @@ The identities use least-privilege RBAC:
 
 - `Contributor` scoped to the corresponding environment Resource Group
 - `Storage Blob Data Contributor` scoped to the Terraform backend Storage Account
+- `Reader` scoped to the Terraform backend Storage Account for management-plane metadata access
 
 GitHub Environments are also separated between plan and apply jobs, allowing Terraform plans to run automatically while infrastructure changes require manual approval.
 
@@ -168,6 +169,7 @@ GitHub Environments are also separated between plan and apply jobs, allowing Ter
 ## Terraform state
 
 Terraform state is stored remotely in Azure Blob Storage.
+The AzureRM backend uses Microsoft Entra ID/OIDC authentication (`use_azuread_auth` and `use_oidc`) instead of Storage Account access keys.
 
 ```
 Storage Account: bootstrapstate
@@ -177,8 +179,8 @@ Container:       tfstate
 DEV and QA use separate backend state keys to keep their states isolated. Example:
 
 ```
-dev/terraform.tfstate
-qa/terraform.tfstate
+dev/dev.tfstate
+qa/qa.tfstate
 ```
 
 ---
@@ -299,3 +301,5 @@ push
 - The exact Terraform plan generated pre-approval is what gets applied (no re-plan drift)
 - Azure RBAC authorization for Key Vault instead of legacy access policies
 - Restricted AKS API access via authorized IP ranges
+- The exact Terraform plan generated pre-approval is applied after approval, preventing re-plan drift
+- Protected deployment environments — `terraform plan` runs automatically, while `terraform apply` requires GitHub Environment approval
