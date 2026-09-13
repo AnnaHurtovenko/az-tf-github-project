@@ -1,6 +1,6 @@
 #resource group
-resource_group_name                    = "qa-rg"
-resource_group_location                = "westeurope"
+resource_group_name     = "qa-rg"
+resource_group_location = "westeurope"
 
 tags = {
   environment = "qa"
@@ -9,10 +9,10 @@ tags = {
 }
 
 #identity
-qa_identity_name                        = "qa-mi"
-identity_location                       = "northeurope"
-bootstrap_storage_account_name          = "bootstrapstate"
-bootstrap_resource_group_name           = "bootstrap-rg"
+qa_identity_name               = "qa-mi"
+identity_location              = "northeurope"
+bootstrap_storage_account_name = "bootstrapstate"
+bootstrap_resource_group_name  = "bootstrap-rg"
 
 #key-vault 
 key_vault_name                          = "qa-kv"
