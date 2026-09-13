@@ -159,3 +159,8 @@ variable "aks_pod_cidr" {
   description = "Overlay pod CIDR, separate from VNet and services."
   type        = string
 }
+
+variable "workload_location" {
+  description = "Azure region for DEV workload resources such as VNet and AKS."
+  type        = string
+}

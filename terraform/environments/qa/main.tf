@@ -34,7 +34,7 @@ module "key_vault" {
 
   name                = var.key_vault_name
   resource_group_name = module.rg.name
-  location            = module.rg.location
+  location            = var.key_vault_location
   tenant_id           = data.azurerm_client_config.current.tenant_id
 
   sku_name                      = var.key_vault_sku_name

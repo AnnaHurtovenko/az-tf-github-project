@@ -36,6 +36,7 @@ subnets = {
 aks_cluster_name       = "dev-aks"
 aks_dns_prefix         = "dev-aks"
 aks_kubernetes_version = null
+workload_location      = "northeurope"
 
 aks_node_pool_name = "system"
 aks_node_vm_size   = "Standard_B2s"

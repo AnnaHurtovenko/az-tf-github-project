@@ -65,3 +65,7 @@ variable "key_vault_public_network_access_enabled" {
   type        = bool
 }
 
+variable "key_vault_location" {
+  description = "Azure region for the Key Vault."
+  type        = string
+}

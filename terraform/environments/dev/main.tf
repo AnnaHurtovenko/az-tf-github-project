@@ -43,7 +43,7 @@ module "network" {
 
   vnet_name           = var.vnet_name
   resource_group_name = module.rg.name
-  location            = module.rg.location
+  location            = var.workload_location
   address_space       = var.vnet_address_space
   subnets             = var.subnets
 
@@ -57,7 +57,7 @@ module "aks" {
   source = "../../modules/aks"
 
   cluster_name                    = var.aks_cluster_name
-  location                        = module.rg.location
+  location                        = var.workload_location
   resource_group_name             = module.rg.name
   dns_prefix                      = var.aks_dns_prefix
   kubernetes_version              = var.aks_kubernetes_version

@@ -16,6 +16,7 @@ bootstrap_resource_group_name  = "bootstrap-rg"
 
 #key-vault 
 key_vault_name                          = "qa-kv"
+key_vault_location                      = "northeurope"
 key_vault_sku_name                      = "standard"
 key_vault_rbac_enabled                  = true
 key_vault_soft_delete_retention_days    = 7
