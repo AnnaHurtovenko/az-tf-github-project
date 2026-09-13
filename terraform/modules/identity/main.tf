@@ -23,3 +23,11 @@ resource "azurerm_role_assignment" "storage_blob_data_contributor" {
   role_definition_name = "Storage Blob Data Contributor"
   principal_id         = azurerm_user_assigned_identity.shared.principal_id
 }
+
+resource "azurerm_role_assignment" "storage_reader" {
+  count = var.grant_storage_reader ? 1 : 0
+
+  scope                = var.storage_account_id
+  role_definition_name = "Reader"
+  principal_id         = azurerm_user_assigned_identity.shared.principal_id
+}

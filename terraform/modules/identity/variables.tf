@@ -42,3 +42,8 @@ variable "storage_account_id" {
   type        = string
   default     = null
 }
+
+variable "grant_storage_reader" {
+  type    = bool
+  default = false
+}

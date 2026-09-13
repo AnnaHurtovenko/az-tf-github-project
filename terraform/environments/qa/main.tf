@@ -17,6 +17,7 @@ module "qa_identity" {
   contributor_scope   = module.rg.id
 
   grant_storage_blob_data_contributor = true
+  grant_storage_reader                = true
   storage_account_id                  = data.azurerm_storage_account.bootstrap.id
   tags                                = merge(var.tags, { environment = "qa" })
 }
