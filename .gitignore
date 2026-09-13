@@ -1,0 +1,43 @@
+# Terraform working directories (providers, modules, and backend metadata).
+**/.terraform/*
+*.terraform
+
+# Local state, backups, and state locks can contain secrets.
+*.tfstate
+*.tfstate.*
+.terraform.tfstate.lock.info
+.terraform.lock.hcl
+
+# Crash reports and local debug logs.
+crash.log
+crash.*.log
+terraform.log
+
+# Use these names/extensions when saving plans with terraform plan -out=...
+*.tfplan
+*.tfplan.*
+tfplan
+tfplan.*
+
+# Variable values are private by default, including *.auto.tfvars.
+*.tfvars.json
+
+# Local configuration overrides.
+override.tf
+override.tf.json
+*_override.tf
+*_override.tf.json
+
+# Terraform CLI configuration and credentials.
+.terraformrc
+terraform.rc
+credentials.tfrc.json
+
+# Local backend settings supplied with -backend-config.
+*.tfbackend
+
+# Local environment secrets; sanitized examples may be committed.
+.env
+.env.*
+!.env.example
+
