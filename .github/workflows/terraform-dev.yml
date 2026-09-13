@@ -41,6 +41,7 @@ jobs:
         id: filter
         uses: dorny/paths-filter@v3
         with:
+          list-files: shell
           filters: |
             dev:
               - 'terraform/environments/dev/**'
@@ -55,6 +56,13 @@ jobs:
               - 'terraform/modules/rg/**'
               - 'terraform/modules/identity/**'
               - 'terraform/modules/key-vault/**'
+
+      - name: Show detected changes
+        run: |
+          echo "DEV = ${{ steps.filter.outputs.dev }}"
+          echo "DEV files = ${{ steps.filter.outputs.dev_files }}"
+          echo "QA = ${{ steps.filter.outputs.qa }}"
+          echo "QA files = ${{ steps.filter.outputs.qa_files }}"
 
 
   dev-plan:
