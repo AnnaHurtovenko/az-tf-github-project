@@ -10,7 +10,7 @@ tags = {
 
 #storage
 storage_account_location = "northeurope"
-storage_account_name     = "devstorage"
+storage_account_name     = "devstorageaz06"
 
 #identity
 dev_identity_name              = "dev-mi"
@@ -39,7 +39,7 @@ aks_kubernetes_version = null
 workload_location      = "northeurope"
 
 aks_node_pool_name = "system"
-aks_node_vm_size   = "Standard_B2s"
+aks_node_vm_size   = "Standard_DC2as_v6"
 aks_node_count     = 1
 
 aks_auto_scaling_enabled = false
