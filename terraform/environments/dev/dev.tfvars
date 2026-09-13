@@ -39,7 +39,7 @@ aks_kubernetes_version = null
 workload_location      = "northeurope"
 
 aks_node_pool_name = "system"
-aks_node_vm_size   = "Standard_DC2as_v6"
+aks_node_vm_size   = "Standard_EC2as_v5"
 aks_node_count     = 1
 
 aks_auto_scaling_enabled = false
