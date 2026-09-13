@@ -55,3 +55,4 @@ containers                          = []
 aks_subnet_name                     = "aks-subnet"
 aks_pod_cidr                        = "10.244.0.0/16"
 aks_api_server_authorized_ip_ranges = ["176.104.184.121/32"]
+
