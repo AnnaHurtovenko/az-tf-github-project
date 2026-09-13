@@ -1,0 +1,254 @@
+name: Terraform
+
+on:
+  pull_request:
+    branches:
+      - develop
+
+  push:
+    branches:
+      - develop
+
+  workflow_dispatch:
+    inputs:
+      environment:
+        description: Environment to run
+        required: true
+        type: choice
+        options:
+          - dev
+          - qa
+
+permissions:
+  pull-requests: read
+  contents: read
+  id-token: write
+
+jobs:
+  changes:
+    name: Detect changes
+    runs-on: ubuntu-latest
+
+    outputs:
+      dev: ${{ steps.filter.outputs.dev }}
+      qa: ${{ steps.filter.outputs.qa }}
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Detect changed environments
+        id: filter
+        uses: dorny/paths-filter@v3
+        with:
+          base: ${{ github.ref }}
+          list-files: shell
+          filters: |
+            dev:
+              - 'terraform/environments/dev/**'
+              - 'terraform/modules/rg/**'
+              - 'terraform/modules/identity/**'
+              - 'terraform/modules/storage/**'
+              - 'terraform/modules/vnet/**'
+              - 'terraform/modules/aks/**'
+
+            qa:
+              - 'terraform/environments/qa/**'
+              - 'terraform/modules/rg/**'
+              - 'terraform/modules/identity/**'
+              - 'terraform/modules/key-vault/**'
+
+      - name: Show detected changes
+        run: |
+          echo "DEV = ${{ steps.filter.outputs.dev }}"
+          echo "DEV files = ${{ steps.filter.outputs.dev_files }}"
+          echo "QA = ${{ steps.filter.outputs.qa }}"
+          echo "QA files = ${{ steps.filter.outputs.qa_files }}"
+
+
+  dev-plan:
+    name: DEV - Terraform Plan
+    needs: changes
+    if: needs.changes.outputs.dev == 'true' || (github.event_name == 'workflow_dispatch' && inputs.environment == 'dev')
+
+    runs-on: ubuntu-latest
+
+    environment: dev-plan
+
+    defaults:
+      run:
+        working-directory: terraform/environments/dev
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Format Check
+        working-directory: terraform
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -var-file=dev.tfvars -out=tfplan
+
+      - name: Upload Terraform Plan
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-dev
+          path: terraform/environments/dev/tfplan
+          retention-days: 1
+
+  dev-apply:
+    name: DEV - Terraform Apply
+    needs:
+      - changes
+      - dev-plan
+
+    if: >
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/develop' &&
+      needs.changes.outputs.dev == 'true'
+
+    runs-on: ubuntu-latest
+
+    environment: dev
+
+    defaults:
+      run:
+        working-directory: terraform/environments/dev
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-dev
+          path: terraform/environments/dev
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
+
+
+  qa-plan:
+    name: QA - Terraform Plan
+    needs: changes
+    if: needs.changes.outputs.qa == 'true' || (github.event_name == 'workflow_dispatch' && inputs.environment == 'qa')
+
+    runs-on: ubuntu-latest
+
+    environment: qa-plan
+
+    defaults:
+      run:
+        working-directory: terraform/environments/qa
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Format Check
+        working-directory: terraform
+        run: terraform fmt -check -recursive
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Terraform Validate
+        run: terraform validate
+
+      - name: Terraform Plan
+        run: terraform plan -var-file=qa.tfvars -out=tfplan
+
+      - name: Upload Terraform Plan
+        if: github.event_name == 'push'
+        uses: actions/upload-artifact@v4
+        with:
+          name: tfplan-qa
+          path: terraform/environments/qa/tfplan
+          retention-days: 1
+
+  qa-apply:
+    name: QA - Terraform Apply
+    needs:
+      - changes
+      - qa-plan
+
+    if: >
+      github.event_name == 'push' &&
+      github.ref == 'refs/heads/develop' &&
+      needs.changes.outputs.qa == 'true'
+
+    runs-on: ubuntu-latest
+
+    environment: qa
+
+    defaults:
+      run:
+        working-directory: terraform/environments/qa
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Azure Login
+        uses: azure/login@v3
+        with:
+          client-id: ${{ secrets.AZURE_CLIENT_ID }}
+          tenant-id: ${{ secrets.AZURE_TENANT_ID }}
+          subscription-id: ${{ secrets.AZURE_SUBSCRIPTION_ID }}
+
+      - name: Setup Terraform
+        uses: hashicorp/setup-terraform@v3
+
+      - name: Terraform Init
+        run: terraform init
+
+      - name: Download Terraform Plan
+        uses: actions/download-artifact@v4
+        with:
+          name: tfplan-qa
+          path: terraform/environments/qa
+
+      - name: Terraform Apply
+        run: terraform apply -auto-approve tfplan
